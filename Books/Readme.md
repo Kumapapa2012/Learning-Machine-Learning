@@ -58,8 +58,8 @@ python environment.py
 python experiment.py  
 
 experience.py が起動すると、以下の動画のようにオセロゲームが始まります。  
-[![Reversi played by simple DQN agent.]<iframe width="560" height="315" src="https://www.youtube.com/embed/qwigP7s1PU4" frameborder="0" allowfullscreen></iframe>]
-
+Reversi played by simple DQN agent.Reversi played by simple DQN agent.  
+https://www.youtube.com/embed/qwigP7s1PU4
 
 なお、現時点では実行後にモデルをファイルに書き出す実装は行っていません。実行するたびにゼロから学習のやり直しになります。
 また、三目並べに比べてオセロは複雑ですが、エージェントのロジックが三目並べとほぼ同じであるためか、書籍のように　100% の勝率にはなりません。
