@@ -40,7 +40,8 @@ chainer 1.21.0
 セットアップ手順は、「実装 ディープラーニング」に従っています。
 
 ## 4．実行手順  
-「実装 ディープラーニング」の三目並べの起動手順と同じです。ターミナルを 4 つ起動し、それぞれ以下を実行します。  
+「実装 ディープラーニング」の三目並べの起動手順と基本的に同じです。
+ターミナルを 4 つ起動し、それぞれ以下を実行します。  
 ### 1つ目のターミナル:  
 rl_glue  
 ### 2つ目のターミナル:  
@@ -57,7 +58,8 @@ python environment.py
 python experiment.py  
 
 experience.py が起動すると、以下の動画のようにオセロゲームが始まります。  
-<iframe width="560" height="315" src="https://www.youtube.com/embed/qwigP7s1PU4" frameborder="0" allowfullscreen></iframe>
+
+[![Alt text](https://img.youtube.com/vi/qwigP7s1PU4/0.jpg)](https://www.youtube.com/watch?v=qwigP7s1PU4)
 
 なお、現時点では実行後にモデルをファイルに書き出す実装は行っていません。実行するたびにゼロから学習のやり直しになります。
 また、三目並べに比べてオセロは複雑ですが、エージェントのロジックが三目並べとほぼ同じであるためか、書籍のように　100% の勝率にはなりません。
