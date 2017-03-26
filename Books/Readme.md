@@ -47,8 +47,7 @@ rl_glue
 . activate main  
 python agent.py --gpu 0 --size 8  
 注)  
-CPU で実行する場合は "--gpu"　無しで実行します。  
---size は ボードの1辺のマス数で、6 以上の偶数を指定します。
+この例では、8x8 サイズのボード、GPU &#35;0 を使用します。  
 
 ### 3つ目のターミナル:  
 . activate main  
@@ -58,8 +57,7 @@ python environment.py
 python experiment.py  
 
 experience.py が起動すると、以下の動画のようにオセロゲームが始まります。  
-Reversi played by simple DQN agent.Reversi played by simple DQN agent.  
-https://www.youtube.com/embed/qwigP7s1PU4
+<iframe width="560" height="315" src="https://www.youtube.com/embed/qwigP7s1PU4" frameborder="0" allowfullscreen></iframe>
 
 なお、現時点では実行後にモデルをファイルに書き出す実装は行っていません。実行するたびにゼロから学習のやり直しになります。
 また、三目並べに比べてオセロは複雑ですが、エージェントのロジックが三目並べとほぼ同じであるためか、書籍のように　100% の勝率にはなりません。
