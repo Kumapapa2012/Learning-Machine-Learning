@@ -67,5 +67,5 @@ experience.py が起動すると、以下の動画のようにオセロゲーム
 ## 5．参考 URL など
 "実装　ディープラーニング"  
 http://shop.ohmsha.co.jp/shopdetail/000000004775/  
-クラバートの樹 No.180 - アルファ碁の着手決定ロジック（１）
+クラバートの樹 No.180 - アルファ碁の着手決定ロジック（１）  
 http://hypertree.blog.so-net.ne.jp/2016-06-17  
