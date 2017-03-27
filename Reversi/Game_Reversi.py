@@ -97,13 +97,13 @@ class Game_Reversi:
             board=np.copy(self.g_board)
         else:
             board=self.g_board
-    
+        
         numFlip = 0 # 返した数
         pos=np.array([row,column])
-    
+        
         # コマを置く
         board[tuple(pos)]=c
-    
+        
         # 指定場所から全方向にチェック。
         # [-1,-1],[-1,0],[-1,1]
         # [ 0,-1],      ,[ 0,1]
