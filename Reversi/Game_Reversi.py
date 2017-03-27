@@ -18,7 +18,10 @@ class Game_Reversi:
     # 表示
     render=True
     
-    
+    #__init__(n_rows,n_cols)
+    #    n_rows: ボードサイズ縦
+    #    n_cols: ボードサイズ横
+    #指定されたボードサイズでクラスを作成。
     def __init__(self,n_rows,n_cols):
         #ボードリセット
         self.n_rows = n_rows
@@ -31,19 +34,24 @@ class Game_Reversi:
         self.g_board[self.n_rows//2,self.n_cols//2-1]=-1
         self.g_board[self.n_rows//2,self.n_cols//2]=1
     
-    #正しい手か判定。置けるかの判定用
-    #一筋でも消せるなら true とする
-    def isValidMove(self,raw,column,c):
+    #isValidMove(self,row,column,c)
+    #    row: コマの位置縦
+    #    col: コマの位置横
+    #    c:対象プレイヤー(1=Agentもしくは人間、-1=Environment)
+    #指定された row,col が、c にとって正しい手か判定。コマを置けるかの判定用。
+    #一筋でも相手のコマを返せるならば true とする
+    #Return: 正しい手=True、無効な手=False
+    def isValidMove(self,row,column,c):
         #
         # Phase 0: すでにコマがあるか
         #
-        if (self.g_board[raw,column] != 0):
+        if (self.g_board[row,column] != 0):
             return False
         
         result=False
-        pos=np.array([raw,column])    
+        pos=np.array([row,column])    
         # 指定場所から全方向にチェック。
-        # 消せるコマが一つでもあれば終了
+        # 返せる相手のコマが一つでもあれば終了
         for direction in ([-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]):
             if not (0 <= (pos+direction)[0] < self.n_rows and 0 <= (pos+direction)[1] < self.n_cols ) :
                 # 範囲外処理スキップ
@@ -62,11 +70,12 @@ class Game_Reversi:
                         # 判定がつく前に空のマスなので終了
                         break
                     elif (self.g_board[tuple(cpos)] == -c):
-                        # 自コマがこの先あれば、取れる可能性のあるコマ
+                        # 自コマがこの先あれば、取れる可能性のあるコマ。
+                        # 自コマの探索を続ける。
                         cpos = cpos+direction
                         continue
                     elif (self.g_board[tuple(cpos)] == c):
-                        # 少なくともコマを一つ返せるため、
+                        # 少なくともコマを一つ返せるため、この時点で探索終了。
                         result=True
                         break
                     else:
@@ -74,10 +83,14 @@ class Game_Reversi:
                         exit()
         return result
     
-    #コマを置いて、相手のコマを返す。
+    #putStone(row,column,c,sim)
+    #    row: コマの位置縦
+    #    col: コマの位置横
+    #    c: 対象プレイヤー(1=Agentもしくは人間、-1=Environment)
+    #    sim: 結果をゲームに反映するか(False=ゲームに反映する、True=ゲームに反映しない)。
     #前提条件： すでに、isValidMove で正しい位置であることが確認済。
+    #コマを置いて、相手のコマを返す。
     #第 4 引数 sim(ulation) == True とするとコピーのボードで処理し、実際のボードはタッチしない。
-    #
     #Return: 返した相手のコマの数
     def putStone(self,row,column,c,sim):
         if sim :
@@ -86,7 +99,7 @@ class Game_Reversi:
             board=self.g_board
     
         numFlip = 0 # 返した数
-        pos=np.array([row,column]) # numpy または cupy の array使用
+        pos=np.array([row,column])
     
         # コマを置く
         board[tuple(pos)]=c
@@ -101,11 +114,13 @@ class Game_Reversi:
             cpos = pos + dir
             while 0 <= cpos [0] < self.n_rows and 0 <= cpos [1] < self.n_cols:
                 if (board[tuple(cpos)] == -c):  
-                    #相手のコマがある。同方向の次のコマに移る。
+                    #相手のコマがある。
+                    #同方向の次のコマで探索を継続。
                     cpos=cpos+dir
                     continue
                 elif (board[tuple(cpos)] == c): 
-                    # 自コマで相手コマを挟める。
+                    #自コマで相手コマを挟める。
+                    #この場所から、相手のコマを返す。
                     f_canFlip=True
                     break
                 elif (board[tuple(cpos)] == 0): 
@@ -125,6 +140,8 @@ class Game_Reversi:
         return numFlip
     
     
+    #resetBoard()
+    #ボードをゲーム初期状態に戻す。
     def resetBoard(self):
         self.g_board=self.g_board*0
         #ボードリセット
@@ -133,6 +150,10 @@ class Game_Reversi:
         self.g_board[self.n_rows//2,self.n_cols//2-1]=-1
         self.g_board[self.n_rows//2,self.n_cols//2]=1
     
+    #getPositionAvail(c)
+    #    c: 対象プレイヤー(1=Agentもしくは人間、-1=Environment)
+    #現時点の盤面で、対象プレイヤーがコマを置ける=相手のコマを返すことができる場所を探す。
+    #Return: コマを置ける場所のリスト
     def getPositionAvail(self,c):
         temp=np.vstack(np.where(self.g_board==0))
         nullTiles=np.hstack((temp[0].reshape(-1,1),temp[1].reshape(-1,1)))    
@@ -144,17 +165,17 @@ class Game_Reversi:
                 can_put.append(p_pos)
         return can_put
 
-    #
-    # 指定したコマ色で、コマを置ける場所
-    #
+    #getPosition(c)
+    #    c: 対象プレイヤー(1=Agentもしくは人間、-1=Environment)
+    #現時点の盤面でコマを置ける場所のうち、以下のルールで置くべき場所を返す。
+    #1. 四隅にコマが置ける場合は、90% の確率でそこを取る
+    #2. 他の場合は、80% の確率で最も返せるコマの数が多いものを取得する。
+    #3. いずれでも決まらない場合ランダム(結局　1,2　のものとなる可能性もある。)
+    #Return: コマを置くべき場所
     def getPosition(self,c):
         can_put=[]
         can_put=self.getPositionAvail(c)
-        # おける場所リストからひとつ選ぶ。
-        #　条件：
-        # 1. 角がある場合は、90% の確率でそこを取る
-        #　2. 他の場合は、80% の確率で最も数が多いものを取得する。
-        #　3. いずれでも決まらない場合ランダム(結局　1,2　のものとなる可能性あり。)
+        
         maxPos=[]
         cornerPos=[]
         returnPos=[]
@@ -192,6 +213,12 @@ class Game_Reversi:
         
         return returnPos
         
+    #step(player_pos)
+    #    player_pos: Agentもしくは人間がコマを打つ位置
+    #1. 受け取った位置に相手のコマを置き、ボードに反映する。
+    #2. 自身のコマを置きボードに反映する。
+    #3. 報酬の決定、終了判定を行う
+    #Return: ボード状態、報酬、終了かどうか
     def step(self,player_pos):
         #　パスしたか?    
         if player_pos ==(-1,-1) :
@@ -240,8 +267,8 @@ class Game_Reversi:
         
         if done :
             #　2.　終了ならば報酬計算
-            num_agent=len(np.where(self.g_board==self.turn)[1])       #　2　x(コマ数)の配列になるため
-            num_envionment=len(np.where(self.g_board==-self.turn)[1]) #　2　x(コマ数)の配列になるため
+            num_agent=len(np.where(self.g_board==self.turn)[1])       #　[1]指定は、2　x(コマ数)の配列になるため
+            num_envionment=len(np.where(self.g_board==-self.turn)[1]) #　[1]指定は、2　x(コマ数)の配列になるため
             if self.render : print("you:%i/environment:%i" % (num_agent,num_envionment))
             # 判定
             if num_agent > num_envionment :
