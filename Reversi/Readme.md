@@ -52,8 +52,10 @@ python agent.py --gpu 0 --size 8
 
 ### 3つ目のターミナル:  
 . activate main  
-python environment.py  
-### 4つ目のターミナル:  
+python environment.py --size 8   
+注)  
+この例では、8x8 サイズのボードを使用します。size は Agent 起動時のサイズと同じ値にしてください。
+### 4つ目のターミナル:  
 . activate main  
 python experiment.py  
 
