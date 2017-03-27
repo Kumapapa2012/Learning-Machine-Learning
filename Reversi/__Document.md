@@ -1,4 +1,4 @@
-# 教科学習 Reversi
+# 強化学習 Reversi
 
 ## agent.py
 ### Usage:  
