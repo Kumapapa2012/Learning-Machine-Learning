@@ -1,6 +1,8 @@
 #
 # -*- coding: utf-8 -*- 
-
+#
+# Game_Reversi.py を人間がテストするためのスクリプト
+#
 import sys
 import Game_Reversi as game
 
@@ -11,7 +13,6 @@ bFirst=True
 while True:
     if bFirst : print(g.g_board) ; bFirst=False
     try:
-        # Print の代わりに別のものを出力する
         print("Input coordination in N,N format(like'4,3') for "+str(turn))
         print("To Pass, enter '-1,-1'")
         if sys.version_info.major == 2:
@@ -19,7 +20,6 @@ while True:
         else: #should be 3.x
             pos=tuple(map(int,input().split(',')))
     except ValueError:
-        # Print の代わりに別のものを出力する
         print("Invalid...")
         continue
     

@@ -17,9 +17,14 @@ from rlglue.types import Action
 from rlglue.types import Observation
 from rlglue.utils import TaskSpecVRLGLUE3
 
-
+# QNet
+# ニューラルネットワークのクラス
 class QNet(chainer.Chain):
-
+	
+	# __init__( n_in, n_units, n_out)
+	#       n_in: 入力層サイズ
+	#    n_units: 中間層サイズ
+	#      n_out: 出力層サイズ
     def __init__(self, n_in, n_units, n_out):
         super(QNet, self).__init__(
             l1=L.Linear(n_in, n_units),
@@ -34,6 +39,10 @@ class QNet(chainer.Chain):
             l3=L.Linear(n_units, n_out),
         )
 
+	#value(x)
+	#       x: 入力層の値
+	#ニューラルネットワークによる計算
+	#Return: 出力層の結果
     def value(self, x):
         h = F.relu(self.l1(x))
         h = F.relu(self.l20(h))
@@ -46,35 +55,48 @@ class QNet(chainer.Chain):
         h = F.relu(self.l27(h))
         return self.l3(h)
 
+	#__call__(x)
+	#    s_data: 状態
+	#    a_data: アクション
+	#    y_data: 教師データ(次の行動の最大Q値)
+	#学習用コールバック。
+	#1. s_data を Forward 伝播する(Q,Q_Data)
+	#2. t_data に Q_Dataをコピー
+	#3．t_data の a_data[i] の値を y_data[i]の Q 値で置き換え教師データ作成(t)
+	#4. Q,t の二乗誤差を算出
+	#
+	#Return: 二乗誤差計算結果
     def __call__(self, s_data, a_data, y_data):
         self.loss = None
-
+        
         s = chainer.Variable(self.xp.asarray(s_data))
         Q = self.value(s)
-
+        
         Q_data = copy.deepcopy(Q.data)
-
+        
         if type(Q_data).__module__ != np.__name__:
             Q_data = self.xp.asnumpy(Q_data)
-
+        
         t_data = copy.deepcopy(Q_data)
         for i in range(len(y_data)):
             t_data[i, a_data[i]] = y_data[i]
-
+        
         t = chainer.Variable(self.xp.asarray(t_data))
         self.loss = F.mean_squared_error(Q, t)
-
+        
         print('Loss:', self.loss.data)
-
+        
         return self.loss
-
+        
 # エージェントクラス
 class KmoriReversiAgent(Agent):
-
-    # エージェントの初期化
-    # 学習の内容を定義する
+    
+	#__init__(gpu, size)
+	#    gpu: GPU 番号(0以上、CPU 使用の場合 -1)
+	#    size: 正方形ボードの 1 辺の長さ(6 以上の偶数)
+    # エージェントの初期化、学習の内容を定義する
     def __init__(self, gpu, size):
-        # サイズは　6　以上の偶数で。
+        # サイズは 6 以上の偶数で。
         if size<6 and size%2 != 0 : print("size must be even number and 6 or above!") ; exit()
         # 盤の情報(オセロは8)
         self.n_rows = int(size)
@@ -122,8 +144,9 @@ class KmoriReversiAgent(Agent):
         self.win_or_draw = 0
         self.stop_learning = 200
 
+	#agent_init(gpu, task_spec_str)
+	#    task_spec_str: RL_Glue から渡されるタスク情報
     # ゲーム情報の初期化
-    # kmori：Environmentの env_init()　から渡される内容をパース
     def agent_init(self, task_spec_str):
         task_spec = TaskSpecVRLGLUE3.TaskSpecParser(task_spec_str)
 
@@ -136,7 +159,6 @@ class KmoriReversiAgent(Agent):
         #　Arg1: 入力層サイズ
         #　Arg2:　隠れ層ノード数
         #　Arg3：　出力層サイズ
-        # 隠れ層はコールバックで作成する。
         self.Q = QNet(self.bdim*self.n_frames, self.bdim*self.n_frames, self.dim)
 
         if self.gpu >= 0:
@@ -149,9 +171,12 @@ class KmoriReversiAgent(Agent):
         self.optimizer = optimizers.RMSpropGraves(lr=0.00025, alpha=0.95,
                                                   momentum=0.0)
         self.optimizer.setup(self.Q)
-
-    # environment.py/env_startの次に呼び出される。
-    # 1手目の○を決定し、実行する。その後情報をまとめてエージェントに送る。
+    
+    #agent_start(observation)
+    #    observation: ゲーム状態(ボード状態など)
+    #environment.py の env_startの次に呼び出される。
+    #1手目 Action を決定し、実行する。
+    #実行した Action をエージェントへの情報として RL_Glue に渡す。
     def agent_start(self, observation):
         # stepを1増やす
         self.step_counter += 1
@@ -175,7 +200,11 @@ class KmoriReversiAgent(Agent):
 
         return action
 
-    # エージェントの二手目以降、ゲームが終わるまで
+    #agent_start(reward, observation)
+    #    reward: 報酬
+    #    observation: ゲーム状態(ボード状態など)
+    #エージェントの二手目以降、ゲームが終わるまで呼ばれる。
+    #(Reversi の場合、報酬は常にゼロとなる)
     def agent_step(self, reward, observation):
         # ステップを1増加
         self.step_counter += 1
@@ -184,7 +213,7 @@ class KmoriReversiAgent(Agent):
         self.update_targetQ()
 
         # 自分が打つ手を決定する。
-        int_action = self.select_int_action()
+        int_action = self.select_int_action() # 戻り値が -1 ならパス。
         action = Action()
         action.intArray = [int_action]
         self.reward = reward
@@ -206,6 +235,8 @@ class KmoriReversiAgent(Agent):
         # ○の位置をエージェントへ渡す
         return action
 
+    #agent_start(reward, observation)
+    #    reward: 報酬
     # ゲームが終了した時点で呼ばれる
     def agent_end(self, reward):
         # 環境から受け取った報酬
@@ -232,12 +263,17 @@ class KmoriReversiAgent(Agent):
                 self.replay_experience()
 
     def agent_cleanup(self):
-        # RL_Cleanup で呼ばれるはず。ここでセーブすればきっといい。
+        # (今後実装)
+        # RL_Cleanup により呼ばれるはず。
+        # ここでモデルをセーブすればきっといい。
         pass
 
     def agent_message(self, message):
         pass
 
+    #update_state(observation=None)
+    #    observation: ゲーム状態(ボード状態など)
+    #ゲーム状態を state に格納する。
     def update_state(self, observation=None):
         # 学習用の状態保存。
         if observation is None:
@@ -260,16 +296,23 @@ class KmoriReversiAgent(Agent):
                                                      .reshape(1, 1, -1))
         self.state = np.hstack((self.state[:, 1:], frame))
 
+    #update_eps()
+    #ゲームの手数合計に基づき、ε-Greedy 法の ε を更新。
     def update_eps(self):
         if self.step_counter > self.learn_start:
             if len(self.replay_mem) < self.capacity:
                 self.eps -= ((self.eps_start - self.eps_end) /
                              (self.capacity - self.learn_start + 1))
 
+    #update_targetQ()
+    #update_freq 毎に、現時点の Q 値を、targetQ(Q 値推測用 Network) にコピー。
     def update_targetQ(self):
         if self.step_counter % self.update_freq == 0:
             self.targetQ = copy.deepcopy(self.Q)
 
+    #select_int_action()
+    #現在のボード状態から、DQN を用いて打つ手を決める。
+    #コマを置く場所を決める。
     def select_int_action(self):
         bits = self.state[0, -1]  #　ここでは stateの最後の要素つまり現時点の情報を得ている。
         
@@ -341,7 +384,8 @@ class KmoriReversiAgent(Agent):
         r = np.asarray(r).astype(np.float32)
         s2 = np.asarray(s2).astype(np.float32)
         t = np.asarray(t).astype(np.float32)
-
+		
+		#Q 値推測用ネットワーク targetQ を取得し、s2の Q 値を求める
         s2 = chainer.Variable(self.xp.asarray(s2))
         Q = self.targetQ.value(s2)
         Q_data = Q.data
@@ -351,6 +395,7 @@ class KmoriReversiAgent(Agent):
         else:
             max_Q_data = np.max(self.xp.asnumpy(Q_data).astype(np.float32), axis=1)
 
+		#targetQで推測した Q 値を使用して 教師データ t 作成
         t = np.sign(r) + (1 - t)*self.gamma*max_Q_data
 
         self.optimizer.update(self.Q, s, a, t)

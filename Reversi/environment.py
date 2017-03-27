@@ -20,6 +20,10 @@ class KmoriReversiEnvironment(Environment):
     # 敵プレイヤーが正常に打つ確率
     opp = 0.75
 
+    #__init__(size)
+    #    size: ボードサイズ
+    #今回は、正方形のボードのみ対応することとする。
+    #指定されたボードサイズでクラスを作成。
     def __init__(self, size):
         self.game= game_base.Game_Reversi(size,size)     
         
@@ -27,20 +31,23 @@ class KmoriReversiEnvironment(Environment):
         self.n_cols = self.game.n_cols
         self.history = []
 
+    #build_map_from_game()
+    #    size: ボードサイズ
+    #現在のボードについて、以下を1次元のリストで表現する。
+    #   0： 現在の盤面(Agent=1　のコマの位置)
+    #   1： 現在の盤面(Environment=-1　のコマの位置)
+    #   2： Agentがコマを置ける場所   
+    #   3： Environmentがコマを置ける場所
+    #Return: Map Data
     def build_map_from_game(self):
-        #以下を1次元のリストで表現する。
-        #   0： 現在の盤面(Agent=1　の石の位置)
-        #   1： 現在の盤面(Environment=-1　の石の位置)
-        #   2： Agentが石を置ける場所   
-        #   3： Environmentが石を置ける場所
         
         map_data=[]
         
-        #   0： 現在の盤面(Agent=1　の石の位置)
+        #   0： 現在の盤面(Agent=1　のコマの位置)
         board_data=(self.game.g_board.reshape(-1)== 1).astype(int)
         map_data.extend(board_data)
         
-        #   1： 現在の盤面(Environment=-1　の石の位置)
+        #   1： 現在の盤面(Environment=-1　のコマの位置)
         board_data=(self.game.g_board.reshape(-1)==-1).astype(int)
         map_data.extend(board_data)
         
@@ -61,14 +68,16 @@ class KmoriReversiEnvironment(Environment):
         
         return map_data
 
-    # RL_Glueの設定を行う。
+    #env_init()
+    #RL_Glueの設定を行う。
     def env_init(self):
-        # OBSERVATONS INTS = 盤の状態 (-1〜1 の値が self.n_rows*self.n_cols*4次元(詳細は、build_map_from_game()))
+        # OBSERVATONS INTS = 盤の状態 (-1 または 1 の値が self.n_rows*self.n_cols*4次元(詳細は、build_map_from_game()))
         # ACTIONS INTS = ○を打つ場所を指定 (-1 ~ (self.n_rows*self.n_cols-1))
         # REWARDS = 報酬 (-1.0 ~ 1.0)   ex) 勝 1, 引分 -0.5, 負 -1
         return 'VERSION RL-Glue-3.0 PROBLEMTYPE episodic DISCOUNTFACTOR 0.99 OBSERVATIONS INTS ('+str(self.n_rows*self.n_cols*4)+' 0 1) ACTIONS INTS (-1 '+str(self.n_rows*self.n_cols-1)+') REWARDS (-1.0 1.0)'
 
-    # Episodeの開始
+    #env_start()
+    #Episodeの開始
     def env_start(self):
         #　plan:Reversi ボード初期化
         self.game.resetBoard()
@@ -90,6 +99,11 @@ class KmoriReversiEnvironment(Environment):
 
         return observation
 
+    #env_step(action)
+    #    action: エージェントの手(コマを置く場所)
+    #エージェントから受け取ったコマを置く場所を、Game_Reversi.py に渡す。
+    #その結果を RL_glue に渡す。
+    #Return: Reward_observation_terminal
     def env_step(self, action):
         # エージェントから受け取った○を打つ場所
         int_action_agent = action.intArray[0]

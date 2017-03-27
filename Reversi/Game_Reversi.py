@@ -239,7 +239,6 @@ class Game_Reversi:
         if self.render : print(self.g_board)
         
         # ****環境のターン
-        # TBI
         stonePos = self.getPosition(-self.turn)
         if stonePos == []:
             # 今は特に処理なし。。
