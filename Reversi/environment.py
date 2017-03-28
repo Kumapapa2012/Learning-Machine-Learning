@@ -44,11 +44,11 @@ class KmoriReversiEnvironment(Environment):
         map_data=[]
         
         #   0： 現在の盤面(Agent=1　のコマの位置)
-        board_data=(self.game.g_board.reshape(-1)== 1).astype(int)
+        board_data=(self.game.g_board.reshape(-1)== self.game.turn).astype(int)
         map_data.extend(board_data)
         
         #   1： 現在の盤面(Environment=-1　のコマの位置)
-        board_data=(self.game.g_board.reshape(-1)==-1).astype(int)
+        board_data=(self.game.g_board.reshape(-1)==-self.game.turn).astype(int)
         map_data.extend(board_data)
         
         #   2： Agent が置ける場所。"turn" の正負でAgent と Environment を表現している。
