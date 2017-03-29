@@ -55,7 +55,7 @@ class QNet(chainer.Chain):
         h = F.relu(self.l27(h))
         return self.l3(h)
 
-    #__call__(x)
+    #__call__(s_data, a_data, y_data)
     #    s_data: 状態
     #    a_data: アクション
     #    y_data: 教師データ(次の行動の最大Q値)
@@ -144,7 +144,7 @@ class KmoriReversiAgent(Agent):
         self.win_or_draw = 0
         self.stop_learning = 200
     
-    #agent_init(gpu, task_spec_str)
+    #agent_init(task_spec_str)
     #    task_spec_str: RL_Glue から渡されるタスク情報
     # ゲーム情報の初期化
     def agent_init(self, task_spec_str):
@@ -200,7 +200,7 @@ class KmoriReversiAgent(Agent):
         
         return action
     
-    #agent_start(reward, observation)
+    #agent_step(reward, observation)
     #    reward: 報酬
     #    observation: ゲーム状態(ボード状態など)
     #エージェントの二手目以降、ゲームが終わるまで呼ばれる。
@@ -235,7 +235,7 @@ class KmoriReversiAgent(Agent):
         # ○の位置をエージェントへ渡す
         return action
     
-    #agent_start(reward, observation)
+    #agent_end(reward)
     #    reward: 報酬
     # ゲームが終了した時点で呼ばれる
     def agent_end(self, reward):
@@ -359,7 +359,7 @@ class KmoriReversiAgent(Agent):
                  self.state, terminal))
         else:
             #　self.replay_mem[1:]　で先頭つまり最古の要素を除く配列に、新しいものを追加。
-            # これにより LIFO　でリストが回転する。
+            # これにより FIFO　でリストが回転する。
             self.replay_mem = (self.replay_mem[1:] +
                 [(self.last_state, self.last_action, self.reward, 
                   self.state, terminal)])
