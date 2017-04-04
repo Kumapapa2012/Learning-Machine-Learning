@@ -1,3 +1,8 @@
+2017/04/04
+以下のファイルを追加
+agent_lrelu_0_1.py : agent.py の Leaky ReLU　Slope=0.1版
+Results_8x8.tgz : [こちら](http://qiita.com/Kumapapa2012/items/9cec4e6d2c935d11f108#_reference-262ffd9ab991216f866e)の内容で解析に使用した出力データ
+
 **
 お知らせ:  
 こちらの内容は、Qiita に投稿しました。  
