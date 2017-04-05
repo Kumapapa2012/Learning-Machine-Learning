@@ -109,14 +109,14 @@ class Game_Reversi:
         # [ 0,-1],      ,[ 0,1]
         # [ 1,-1],[ 1,0],[ 1,1]
         # 返せるコマはすべて返す。
-        for dir in ([-1,-1],[-1,0],[-1,1],[ 0,-1],[ 0,1],[ 1,-1],[ 1,0],[ 1,1]):
+        for direction in ([-1,-1],[-1,0],[-1,1],[ 0,-1],[ 0,1],[ 1,-1],[ 1,0],[ 1,1]):
             f_canFlip=False
-            cpos = pos + dir
+            cpos = pos + direction
             while 0 <= cpos [0] < self.n_rows and 0 <= cpos [1] < self.n_cols:
                 if (board[tuple(cpos)] == -c):  
                     #相手のコマがある。
                     #同方向の次のコマで探索を継続。
-                    cpos=cpos+dir
+                    cpos=cpos+direction
                     continue
                 elif (board[tuple(cpos)] == c): 
                     #自コマで相手コマを挟める。
@@ -132,11 +132,11 @@ class Game_Reversi:
             
             # 現在の cpos の位置から、指定した位置まで後進してコマを返す。
             if f_canFlip :
-                cpos=cpos-dir #返すコマ一つ目
+                cpos=cpos-direction #返すコマ一つ目
                 while np.array_equal(cpos,pos) == False:
                     board[tuple(cpos)] = c
                     numFlip = numFlip + 1
-                    cpos=cpos-dir
+                    cpos=cpos-direction
         return numFlip
     
     
