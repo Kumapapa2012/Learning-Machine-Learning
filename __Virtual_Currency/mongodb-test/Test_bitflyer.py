@@ -44,20 +44,19 @@ def getBoard_bf(product_code):
 # マーケットごとのTickerをとる
 def getTicker_bf(product_code):
     global endPoint_bf
-    path='/v1/ticker'
+    path_api='/v1/ticker'
     query='?product_code='+product_code
-    url=endPoint_bf+path+query
-    response=urllib.request.urlopen(url)
-    board = json.loads(response.read().decode('utf8'))
+    path=path_api+query
+    res_date,board = getResponse_bf(path)
     return board
 
 '''
 # Private なもの
-api_key_bf='YOUR_API_KEY'
+api_key_bf='VbeibYMnKzoP4Ufir5C282'
 
 #import base64
-#api_secret_bf=base64.b64decode(b'YOUR_API_SECRETTxY=')
-api_secret_bf=b'YOUR_API_SECRETTxY='
+#api_secret_bf=base64.b64decode(b'asi1KnrYxoiTnMnGogza6y0gx0au6hM1T0sJ+XJETxY=')
+api_secret_bf=b'asi1KnrYxoiTnMnGogza6y0gx0au6hM1T0sJ+XJETxY='
 
 # sha256 署名 hmac が必要なので暗号化ライブラリのインポート
 import hmac
