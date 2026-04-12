@@ -1,3 +1,8 @@
+2026/04/12
+過去そのまま放置していた問題を、9 年ぶりにある程度解決。
+Qiita に投稿しました。
+https://qiita.com/Kumapapa2012/items/07b046d4f3a412222f86
+
 2017/04/04  
 以下のファイルを追加  
 agent_lrelu_0_1.py : agent.py の Leaky ReLU　Slope=0.1版  

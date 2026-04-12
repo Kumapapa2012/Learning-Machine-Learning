@@ -1,0 +1,21 @@
+# Reversi RL - modern stack
+# Python 3.10+ 推奨
+
+# 強化学習フレームワーク
+gymnasium>=0.29.0
+stable-baselines3>=2.3.0
+sb3-contrib>=2.3.0          # MaskablePPO, ActionMasker
+
+# ディープラーニング（PyTorch + CUDA）
+# CUDA バージョンに合わせて公式サイトのコマンドでインストール:
+#   https://pytorch.org/get-started/locally/
+# 例) CUDA 12.1:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu121
+torch>=2.2.0
+
+# 数値計算
+numpy>=1.26.0
+
+# 可視化・ログ
+tensorboard>=2.15.0
+matplotlib>=3.8.0
